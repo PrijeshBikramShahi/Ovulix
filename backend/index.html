@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONNX Model Prediction</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ONNX Model Prediction</h1>
+        <form id="predict-form">
+            <div class="form-group">
+                <label for="cycleLength">Cycle Length:</label>
+                <input type="number" id="cycleLength" name="cycleLength" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="lengthOfMenses">Length of Menses:</label>
+                <input type="number" id="lengthOfMenses" name="lengthOfMenses" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" step="any" required>
+            </div>
+            <!-- Add more input fields as needed -->
+
+            <button type="submit">Submit</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('predict-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => { data[key] = parseFloat(value) });
+
+            try {
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('result').innerText = `Prediction: ${result.prediction}`;
+                } else {
+                    document.getElementById('result').innerText = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerText = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
